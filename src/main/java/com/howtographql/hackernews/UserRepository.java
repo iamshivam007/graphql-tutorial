@@ -3,6 +3,7 @@ package com.howtographql.hackernews;
 import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class UserRepository {
     }
 
     public User findById(String id) {
-        Document document = users.find(eq("_id", id)).first();
+        Document document = users.find(eq("_id", new ObjectId(id))).first();
         return user(document);
     }
 

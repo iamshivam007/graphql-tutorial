@@ -2,9 +2,10 @@ package com.howtographql.hackernews;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
 import static com.mongodb.client.model.Filters.eq;
 
-import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class LinkRepository {
     }
 
     public Link findById(String id) {
-        Document document = links.find(eq("_id", id)).first();
+        Document document = links.find(eq("_id", new ObjectId(id))).first();
         return link(document);
     }
 
@@ -33,6 +34,7 @@ public class LinkRepository {
         Document document = new Document();
         document.put("url", link.getUrl());
         document.put("description", link.getDescription());
+        document.put("postedBy", link.getUserId());
         links.insertOne(document);
     }
 
@@ -40,6 +42,7 @@ public class LinkRepository {
         return new Link(
                 document.get("_id").toString(),
                 document.getString("url"),
-                document.getString("description"));
+                document.getString("description"),
+                document.getString("postedBy"));
     }
 }
