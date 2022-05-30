@@ -6,7 +6,6 @@ import com.mongodb.client.MongoDatabase;
 import graphql.schema.GraphQLSchema;
 import graphql.servlet.SimpleGraphQLServlet;
 
-import com.howtographql.hackernews.Query;
 import javax.servlet.annotation.WebServlet;
 
 @WebServlet(urlPatterns = "/graphql")
@@ -19,10 +18,15 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
     private static GraphQLSchema buildSchema() {
         MongoDatabase mongoDatabase = new MongoClient().getDatabase("hackernews");
         LinkRepository linkRepository = new LinkRepository(mongoDatabase.getCollection("links"));
+        UserRepository userRepository = new UserRepository(mongoDatabase.getCollection("users"));
         return SchemaParser.newParser()
-                .file("schema.graphqls")
-                .resolvers(new Query(linkRepository), new Mutation(linkRepository))
-                .build()
-                .makeExecutableSchema();
+            .file("schema.graphqls")
+            .resolvers(
+                new Query(linkRepository, userRepository),
+                new Mutation(linkRepository, userRepository),
+                new SigninResolver()
+            )
+            .build()
+            .makeExecutableSchema();
     }
 }

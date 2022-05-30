@@ -2,7 +2,7 @@ package com.howtographql.hackernews;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.bson.types.ObjectId;
+import static com.mongodb.client.model.Filters.eq;
 
 import javax.print.Doc;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class LinkRepository {
     }
 
     public Link findById(String id) {
-        Document document = links.find().first();
+        Document document = links.find(eq("_id", id)).first();
         return link(document);
     }
 

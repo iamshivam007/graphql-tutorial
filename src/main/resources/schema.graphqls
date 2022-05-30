@@ -4,12 +4,32 @@ type Link {
     description: String!
 }
 
+type User {
+    id: ID!
+    name: String!
+    email: String
+    password: String
+}
+
+input AuthData {
+    email: String!
+    password: String!
+}
+
 type Query {
     allLinks: [Link]
+    allUsers: [User]
+}
+
+type SigninPayload {
+    user: User!
+    token: String!
 }
 
 type Mutation {
+    createUser(name: String!, authProvider: AuthData!): User
     createLink(url: String!, description: String!): Link
+    signinUser(auth: AuthData): SigninPayload
 }
 
 schema {
