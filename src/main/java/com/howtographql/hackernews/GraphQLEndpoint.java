@@ -4,7 +4,6 @@ import com.coxautodev.graphql.tools.SchemaParser;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import graphql.schema.GraphQLSchema;
-import graphql.servlet.GraphQLContext;
 import graphql.servlet.SimpleGraphQLServlet;
 
 import javax.servlet.annotation.WebServlet;
@@ -18,10 +17,12 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
     static MongoDatabase mongoDatabase = new MongoClient().getDatabase("hackernews");
     private final static LinkRepository linkRepository;
     private final static UserRepository userRepository;
+    private final static VoteRepository voteRepository;
 
     static {
         linkRepository = new LinkRepository(mongoDatabase.getCollection("links"));
         userRepository = new UserRepository(mongoDatabase.getCollection("users"));
+        voteRepository = new VoteRepository(mongoDatabase.getCollection("votes"));
     }
 
     public GraphQLEndpoint() {
@@ -43,10 +44,11 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
         return SchemaParser.newParser()
             .file("schema.graphqls")
             .resolvers(
-                new Query(linkRepository, userRepository),
-                new Mutation(linkRepository, userRepository),
+                new Query(linkRepository, userRepository, voteRepository),
+                new Mutation(linkRepository, userRepository, voteRepository),
                 new SigninResolver(),
-                new LinkResolver(userRepository)
+                new LinkResolver(userRepository, voteRepository),
+                new VoteResolver(userRepository, linkRepository)
             )
             .build()
             .makeExecutableSchema();

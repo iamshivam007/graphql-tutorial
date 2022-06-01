@@ -11,10 +11,12 @@ public class Mutation implements GraphQLRootResolver {
 
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
+    private final VoteRepository voteRepository;
 
-    public Mutation(LinkRepository linkRepository, UserRepository userRepository) {
+    public Mutation(LinkRepository linkRepository, UserRepository userRepository, VoteRepository voteRepository) {
         this.linkRepository = linkRepository;
         this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
     }
 
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
@@ -31,7 +33,6 @@ public class Mutation implements GraphQLRootResolver {
     public User createUser(String name, AuthData authData) {
         User newUser = new User(name, authData.getEmail(), authData.getPassword());
         userRepository.saveUser(newUser);
-        System.out.println(newUser);
         return newUser;
     }
 
@@ -41,5 +42,14 @@ public class Mutation implements GraphQLRootResolver {
             return new SigninPayload(user, user.getId());
         }
         throw new GraphQLException("Invalid user");
+    }
+
+    public Vote createVote(String linkId, DataFetchingEnvironment env) {
+        AuthContext context = env.getContext();
+        User user = context.getUser();
+        Link link = linkRepository.findById(linkId);
+        Vote vote = new Vote(user.getId().toString(), link.getId().toString());
+        voteRepository.saveVote(vote);
+        return vote;
     }
 }

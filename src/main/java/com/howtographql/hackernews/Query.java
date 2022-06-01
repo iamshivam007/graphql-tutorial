@@ -11,10 +11,12 @@ public class Query implements GraphQLRootResolver {
 
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
+    private final VoteRepository voteRepository;
 
-    public Query(LinkRepository linkRepository, UserRepository userRepository) {
+    public Query(LinkRepository linkRepository, UserRepository userRepository, VoteRepository voteRepository) {
         this.linkRepository = linkRepository;
         this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
     }
 
     public List<Link> allLinks() {
@@ -22,6 +24,9 @@ public class Query implements GraphQLRootResolver {
     }
     public List<User> allUsers() {
         return userRepository.getAllUsers();
+    }
+    public List<Vote> allVotes() {
+        return voteRepository.getAllVotes();
     }
 
 }
